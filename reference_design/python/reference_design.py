@@ -366,18 +366,18 @@ def error_function(labels, y_hat):
 
 def dererror(y_hat, label):
     """
-    The derivitive of the error function
+    The derivitive of the error function for a single node (not a vector).
     """
     return y_hat - label
 
 
-INPUT_VECTORS_AND_SET = [ [0, 0], [0, 1], [0, 1], [1, 1] ]
+INPUT_VECTORS_AND_SET = [ [0, 0], [1, 0], [0, 1], [1, 1] ]
 LABEL_VECTORS_AND_SET = [ [0],    [0],    [0],    [1]    ]
 
 INPUT_VECTORS_BLOG_SET = [ [0.05, 0.10] ]
 LABEL_VECTORS_BLOG_SET = [ [0.01, 0.99] ]
 
-INPUT_VECTORS_XOR_SET = [ [0, 0], [0, 1], [0, 1], [1, 1] ]
+INPUT_VECTORS_XOR_SET = [ [0, 0], [1, 0], [0, 1], [1, 1] ]
 LABEL_VECTORS_XOR_SET = [ [0],    [1],    [1],    [0]    ]
 
 if __name__ == "__main__":
@@ -391,7 +391,7 @@ if __name__ == "__main__":
                         weight_initializer=small_random_numbers,
                         activation=sigmoid,
                         derivative_activation=dersigmoid,
-                        learning_rate=0.3,
+                        learning_rate=0.6,
                         layer_index = 2,
                         bias=1.0,
                         bias_weight=0.6,
@@ -403,7 +403,7 @@ if __name__ == "__main__":
                         weight_initializer=small_random_numbers,
                         activation=sigmoid,
                         derivative_activation=dersigmoid,
-                        learning_rate=0.3,
+                        learning_rate=0.6,
                         layer_index = 1,
                         bias=1.0,
                         bias_weight=0.35,
@@ -414,7 +414,7 @@ if __name__ == "__main__":
                         weight_initializer=small_random_numbers,
                         activation=sigmoid,
                         derivative_activation=dersigmoid,
-                        learning_rate=0.3,
+                        learning_rate=0.6,
                         layer_index = 0,
                         bias=None,
                         bias_weight=None,
@@ -428,6 +428,6 @@ if __name__ == "__main__":
     hidden_layer.set_next_layer(output_layer)
     network = Network(input_layer, [hidden_layer], output_layer, error_function)
 
-    network.run(input_vectors, labels, epochs=200)
+    network.run(input_vectors, labels, epochs=20000000)
     network.evaluate(input_vectors, labels)
 
