@@ -58,15 +58,15 @@ func main() {
 	derError := derError
 
 	inNodes := []Node{
-		*NewNode(weightInitializer, activationFunction, derActivationFunction, 0, learningRate, 0, derError),
-		*NewNode(weightInitializer, activationFunction, derActivationFunction, 1, learningRate, 0, derError),
+		*NewNode(weightInitializer, activationFunction, derActivationFunction, 0, learningRate, 0, derError, InputNode),
+		*NewNode(weightInitializer, activationFunction, derActivationFunction, 1, learningRate, 0, derError, InputNode),
 	}
 	hNodes := []Node{
-		*NewNode(weightInitializer, activationFunction, derActivationFunction, 0, learningRate, 1, derError),
-		*NewNode(weightInitializer, activationFunction, derActivationFunction, 1, learningRate, 1, derError),
+		*NewNode(weightInitializer, activationFunction, derActivationFunction, 0, learningRate, 1, derError, HiddenNode),
+		*NewNode(weightInitializer, activationFunction, derActivationFunction, 1, learningRate, 1, derError, HiddenNode),
 	}
 	outNodes := []Node{
-		*NewNode(weightInitializer, activationFunction, derActivationFunction, 0, learningRate, 2, derError),
+		*NewNode(weightInitializer, activationFunction, derActivationFunction, 0, learningRate, 2, derError, OutputNode),
 	}
 
 	hNodes[0].inputNodes = []*Node{&inNodes[0], &inNodes[1]}
@@ -109,5 +109,7 @@ func main() {
 	// Print the crap so it doesn't harass me about things being unused
 	fmt.Println(fmt.Sprintf("Input vectors: %v", inputVectorsAndSet))
 	fmt.Println(fmt.Sprintf("Labels: %v", labelVectorsAndSet))
-	fmt.Println(net)
+	fmt.Println(net.String())
+
+	net.Run(inputVectorsAndSet, labelVectorsAndSet, 10)
 }

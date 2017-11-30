@@ -2,6 +2,14 @@ package main
 
 import "fmt"
 
+type NodeType int
+
+const (
+	InputNode NodeType = iota
+	HiddenNode
+	OutputNode
+)
+
 // WeightInitializer is a typedef for functions passed around for initializing weights.
 type WeightInitializer func(layerIndex int, myIndex int, otherNodeIndex int) (weight floatXX)
 
@@ -28,12 +36,13 @@ type Node struct {
 	layerIndex           int                                                                    // The index of the layer that this node is a part of, 0-based
 	derivativeError      func(thisNodeOutput floatXX, thisNodeLabel floatXX) floatXX            // The derivative of the error function
 	weights              []floatXX                                                              // The weights, lined up with inputNodes
+	myType               NodeType                                                               // The type of this node
 }
 
 // NewNode is a convenience constructor for Nodes.
 // This function returns a pointer to a new Node whose values are set, with the exception of inputNodes
 // and ouputNoddes, which are set to nil.
-func NewNode(weightInitializer WeightInitializer, activationFunction ActivationFunction, derivativeActivation DerivativeActivation, nodeIndex int, learningRate floatXX, layerIndex int, derivativeError DerivativeError) *Node {
+func NewNode(weightInitializer WeightInitializer, activationFunction ActivationFunction, derivativeActivation DerivativeActivation, nodeIndex int, learningRate floatXX, layerIndex int, derivativeError DerivativeError, nodeType NodeType) *Node {
 	return &Node{
 		inputNodes:           nil,
 		outputNodes:          nil,
@@ -45,9 +54,25 @@ func NewNode(weightInitializer WeightInitializer, activationFunction ActivationF
 		layerIndex:           layerIndex,
 		derivativeError:      derivativeError,
 		weights:              []floatXX{},
+		myType:               nodeType,
 	}
 }
 
-func (n Node) String() string {
+func (n *Node) String() string {
 	return fmt.Sprintf("NODE %d.%d", n.myIndex, n.layerIndex)
+}
+
+func (n *Node) UpdateWeights() {
+}
+
+func (n *Node) InvalidateCache() {
+}
+
+func (n *Node) Forward() {
+}
+
+func (n *Node) Backward() (dEdOut floatXX, derAct floatXX, weights []floatXX) {
+}
+
+func (n *Node) Id() {
 }
