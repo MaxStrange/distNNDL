@@ -10,7 +10,7 @@ type network struct {
 	inputLayer   layer
 	hiddenLayers []layer
 	outputLayer  layer
-	errFunc      func(labels []floatXX, outputs []floatXX) (errors []floatXX)
+	errFunc      func(labels []FloatXX, outputs []FloatXX) (errors []FloatXX)
 }
 
 func (net *network) String() string {
@@ -23,8 +23,14 @@ func (net *network) String() string {
 	return buffer.String()
 }
 
+func (net *network) Initialize() {
+	for _, node := range net.AllNeurons() {
+		node.Initialize()
+	}
+}
+
 // Run runs the training for the given number of epochs.
-func (net *network) Run(inputVectors [][]floatXX, labels [][]floatXX, numEpochs int) {
+func (net *network) Run(inputVectors [][]FloatXX, labels [][]FloatXX, numEpochs int) {
 	if len(inputVectors) != len(labels) {
 		log.Fatalf("Len(inputVectors) != len(labels)")
 	} else if len(inputVectors) <= 0 {
@@ -35,7 +41,7 @@ func (net *network) Run(inputVectors [][]floatXX, labels [][]floatXX, numEpochs 
 		log.Fatalf("Input vector size must be equal to input layer size")
 	}
 
-	var accuracies []floatXX
+	var accuracies []FloatXX
 
 	for epochIndex := 0; epochIndex < numEpochs; epochIndex++ {
 		fmt.Println("-------------------------------")
@@ -47,7 +53,7 @@ func (net *network) Run(inputVectors [][]floatXX, labels [][]floatXX, numEpochs 
 			for nodeIndex, node := range net.inputLayer.nodes {
 				node.LoadInput(vec[nodeIndex])
 			}
-			var yHat []floatXX
+			var yHat []FloatXX
 			for _, node := range net.outputLayer.nodes {
 				yHat = append(yHat, node.Forward())
 			}
@@ -56,10 +62,10 @@ func (net *network) Run(inputVectors [][]floatXX, labels [][]floatXX, numEpochs 
 				e := err[nodeIndex]
 				node.LoadError(e, label[node.myIndex])
 			}
-			for node := range net.inputLayer.nodes {
+			for _, node := range net.inputLayer.nodes {
 				node.Backward()
 			}
-			for node := range net.AllNeurons() {
+			for _, node := range net.AllNeurons() {
 				node.UpdateWeights()
 				node.InvalidateCache()
 			}
@@ -72,34 +78,36 @@ func (net *network) Run(inputVectors [][]floatXX, labels [][]floatXX, numEpochs 
 }
 
 // Evaluate evaluates the accuracy of the network on the given inputVectors.
-func (net *network) Evaluate(inputVectors [][]floatXX, labels [][]floatXX) floatXX {
-	totalAcc := floatXX(0.0)
+func (net *network) Evaluate(inputVectors [][]FloatXX, labels [][]FloatXX) FloatXX {
+	totalAcc := FloatXX(0.0)
 	for vecIndex, vec := range inputVectors {
 		label := labels[vecIndex]
 		for nodeIndex, node := range net.inputLayer.nodes {
 			inputVal := vec[nodeIndex]
 			node.LoadInput(inputVal)
 		}
-		var yHat []floatXX
+		var yHat []FloatXX
 		for _, node := range net.outputLayer.nodes {
 			yHat = append(yHat, node.Forward())
 		}
-		acc := int(round(yHat[0])) == int(round(label[0]))
-		totalAcc += acc
-		for node := range net.AllNeurons() {
+		acc := int(yHat[0]+0.5) == int(label[0]+0.5)
+		if acc {
+			totalAcc++
+		}
+		for _, node := range net.AllNeurons() {
 			node.InvalidateCache()
 		}
 	}
-	totalAcc /= floatXX(len(inputVectors))
+	totalAcc /= FloatXX(len(inputVectors))
 	return totalAcc
 }
 
 func (net *network) AllNeurons() []Node {
 	var allNodes []Node
-	allNodes = append(allNodes, net.inputLayer.nodes)
-	for hLayer := range net.hiddenLayers {
-		allNodes = append(allNodes, hLayer.nodes)
+	allNodes = append(allNodes, net.inputLayer.nodes...)
+	for _, hLayer := range net.hiddenLayers {
+		allNodes = append(allNodes, hLayer.nodes...)
 	}
-	allNodes = append(allNodes, net.outputLayer.nodes)
+	allNodes = append(allNodes, net.outputLayer.nodes...)
 	return allNodes
 }

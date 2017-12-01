@@ -116,7 +116,7 @@ class Network:
             for n, input_val in zip(self.input_layer.nodes, vec):
                 n.load_input(input_val)
             y_hat = [n.forward() for n in self.output_layer.nodes]
-            acc = int(round(y_hat[0])) == int(round(label[0]))
+            acc = 1 if int(round(y_hat[0])) == int(round(label[0])) else 0
             total_acc += acc
             for n in self.all_neurons():
                 n.invalidate_cache()
@@ -229,7 +229,7 @@ class Node(object):
         """
         if not self._back_cached:
             self._dE_dOut = 0.0
-            for index, l in enumerate(self.output_nodes):
+            for _, l in enumerate(self.output_nodes):
                 dE_dIn_l, dIn_l_dOut, ws = l.backward()
                 self._dE_dOut += dE_dIn_l * dIn_l_dOut * ws[self.my_index]
             self._dOut_dIn = self.derivative_activation(self._myout)

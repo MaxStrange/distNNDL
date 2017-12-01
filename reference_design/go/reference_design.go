@@ -8,22 +8,22 @@ import (
 
 // Takes a slice of labels and a slice of outputs for a given forward pass
 // and returns the error vector to pass back through the network for backprop.
-func errorFunction(labels []floatXX, outputs []floatXX) (err []floatXX) {
+func errorFunction(labels []FloatXX, outputs []FloatXX) (err []FloatXX) {
 	for i, label := range labels {
 		output := outputs[i]
-		thisErr := floatXX(math.Pow(float64(0.5*(label-output)), 2))
+		thisErr := FloatXX(math.Pow(float64(0.5*(label-output)), 2))
 		err = append(err, thisErr)
 	}
 	return err
 }
 
 // Derivative of error function
-func derError(thisNodeOutput floatXX, thisNodeLabel floatXX) floatXX {
+func derError(thisNodeOutput FloatXX, thisNodeLabel FloatXX) FloatXX {
 	return thisNodeOutput - thisNodeLabel
 }
 
 // Small random numbers weight initializer
-func smallRandomNumbers(_layerIndex int, _myIndex int, _otherNodeIndex int) (weight floatXX) {
+func smallRandomNumbers(_layerIndex int, _inIndex int, _outIndex int) (weight FloatXX) {
 	const epsilon = 0.1
 	var neg float32
 	if rand.Float32() > 0.5 {
@@ -31,30 +31,30 @@ func smallRandomNumbers(_layerIndex int, _myIndex int, _otherNodeIndex int) (wei
 	} else {
 		neg = -1.0
 	}
-	weight = floatXX(rand.Float32() * epsilon * neg)
+	weight = FloatXX(rand.Float32() * epsilon * neg)
 	return weight
 }
 
 // Logistic function activation
-func logistic(dotProduct floatXX) floatXX {
-	return floatXX(1.0 / (1.0 + math.Pow(math.E, -float64(dotProduct))))
+func logistic(dotProduct FloatXX) FloatXX {
+	return FloatXX(1.0 / (1.0 + math.Pow(math.E, -float64(dotProduct))))
 }
 
 // Derivative of the logistic activation function
-func derLogistic(z floatXX) floatXX {
+func derLogistic(z FloatXX) FloatXX {
 	return z * (1.0 - z)
 }
 
 func main() {
 	// Data Set
-	inputVectorsAndSet := [][]floatXX{{0, 0}, {0, 1}, {0, 1}, {1, 1}}
-	labelVectorsAndSet := [][]floatXX{{0}, {0}, {0}, {1}}
+	inputVectorsAndSet := [][]FloatXX{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
+	labelVectorsAndSet := [][]FloatXX{{0}, {0}, {0}, {1}}
 
 	// Some params
 	weightInitializer := smallRandomNumbers
 	activationFunction := logistic
 	derActivationFunction := derLogistic
-	learningRate := floatXX(0.3)
+	learningRate := FloatXX(0.3)
 	derError := derError
 
 	inNodes := []Node{
@@ -111,5 +111,6 @@ func main() {
 	fmt.Println(fmt.Sprintf("Labels: %v", labelVectorsAndSet))
 	fmt.Println(net.String())
 
+	// TODO: need to initialize the network's weights first
 	net.Run(inputVectorsAndSet, labelVectorsAndSet, 10)
 }
