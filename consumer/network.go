@@ -28,34 +28,48 @@ func makeNetwork(batchLength int, epochLength int, mixLength int) *network {
 
 func (net *network) parseNetFromNNDL(nndl string) {
 	parseNNDLIntoNetwork(nndl, net)
-	fmt.Println("Parsed network from input. Here it is:")
-	fmt.Println(net.string())
-	fmt.Println("Initializing network weights")
 	for _, l := range net.nodes {
 		for _, n := range l {
 			n.initialize()
 		}
 	}
-	fmt.Fprintf(os.Stdout, "After initialization: %s\n", net.weightsToString())
 }
 
 // To be called AFTER a synchronous call to parseNetFromNNDL
 func (net *network) train(dataChan <-chan string, mainChan chan<- string) {
-	fmt.Fprintf(os.Stdout, "Before training, weights are: %s\n", net.weightsToString())
 	var dataIndex int
+	var totalErr [][]float64
 	for {
 		rawData, ok := <-dataChan
 		if !ok {
 			break
 		}
 		dataIndex++
-		fmt.Println(rawData)
 
+		fmt.Println(rawData)
 		input, label := parseData(rawData)
-		net.forward(input)
+		yHat := net.forward(input)
+
+		fmt.Fprintf(os.Stdout, "yHat: %v\n", yHat)
+		err := errorFunction(label, yHat)
+		totalErr = append(totalErr, err)
+
+		fmt.Fprintf(os.Stdout, "Err: %v\n", err)
 		if dataIndex%net.batchLength == 0 {
-			net.backward(label)
+			avgErr := averageError(totalErr)
+
+			fmt.Fprintf(os.Stdout, "AvgErr: %v\n", avgErr)
+			for nodeIndex, n := range net.nodes[len(net.nodes)-1] {
+				e := avgErr[nodeIndex]
+				fmt.Fprintf(os.Stdout, "  Loading error: %f\n", e)
+				n.loadError(e, label[n.myIndex])
+			}
+
+			fmt.Fprintf(os.Stdout, "Backproping...\n")
+			net.backward()
+
 			mainChan <- net.weightsToString()
+			totalErr = [][]float64{}
 		}
 		if dataIndex%net.mixLength == 0 {
 			// TODO average the weights amongst the group
@@ -64,7 +78,20 @@ func (net *network) train(dataChan <-chan string, mainChan chan<- string) {
 	mainChan <- net.weightsToString()
 }
 
-func (net *network) forward(inputVector []float64) {
+func averageError(totalErr [][]float64) []float64 {
+	var avgErr []float64
+	l := len(totalErr[0])
+	for i := 0; i < l; i++ {
+		var e float64
+		for j := 0; j < len(totalErr); j++ {
+			e += totalErr[j][i]
+		}
+		avgErr = append(avgErr, e)
+	}
+	return avgErr
+}
+
+func (net *network) forward(inputVector []float64) []float64 {
 	for nodeIndex, n := range net.nodes[0] {
 		n.loadInput(inputVector[nodeIndex])
 	}
@@ -72,11 +99,19 @@ func (net *network) forward(inputVector []float64) {
 	for _, n := range net.nodes[len(net.nodes)-1] {
 		yHat = append(yHat, n.forward())
 	}
-	fmt.Fprintf(os.Stdout, "y_hat: %v\n", yHat)
+	return yHat
 }
 
-func (net *network) backward(labelVector []float64) {
-	// TODO
+func (net *network) backward() {
+	for _, n := range net.nodes[0] {
+		n.backward()
+	}
+	for _, l := range net.nodes {
+		for _, n := range l {
+			n.updateWeights()
+			n.invalidateCache()
+		}
+	}
 }
 
 func parseData(rawData string) (input []float64, label []float64) {

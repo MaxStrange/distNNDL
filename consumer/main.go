@@ -39,6 +39,8 @@ func main() {
 			fmt.Println(msg)
 			net.parseNetFromNNDL(msg)
 			go net.train(dataChan, trainingChan)
+		case msg := <-trainingChan:
+			fmt.Println(msg)
 		}
 	}
 }

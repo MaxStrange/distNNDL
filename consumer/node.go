@@ -137,7 +137,7 @@ func (n *node) forward() float64 {
 	}
 
 	n.myoutCached = true
-	fmt.Fprintf(os.Stdout, "      Returning %f", n.myout)
+	fmt.Fprintf(os.Stdout, "      Returning %f\n", n.myout)
 	return n.myout
 }
 
@@ -150,13 +150,23 @@ func (n *node) loadError(err float64, label float64) {
 // backward calculates the gradients but does not update the weights.
 // To update the weights, call n.UpdateWeights().
 func (n *node) backward() (dEdOut float64, derAct float64, weights []float64) {
+	fmt.Fprintf(os.Stdout, "Backproping node %s\n", n.String())
 	if !n.backCached {
 		if n.myType == outputNode {
+			fmt.Fprintf(os.Stdout, "  Output Node\n")
 			n.dEdOut = n.derivativeError(n.myout, n.label)
-			for i, input := range n.inputs {
-				n.dEdW[i] = n.dEdOut * n.derivativeActivation(n.myout) * input
+			fmt.Fprintf(os.Stdout, "  Calculated dEdOut as %f", n.dEdOut)
+			if len(n.dEdW) == 0 {
+				for _, input := range n.inputs {
+					n.dEdW = append(n.dEdW, n.dEdOut*n.derivativeActivation(n.myout)*input)
+				}
+			} else {
+				for i, input := range n.inputs {
+					n.dEdW[i] = n.dEdOut * n.derivativeActivation(n.myout) * input
+				}
 			}
 		} else {
+			fmt.Fprintf(os.Stdout, "  Non-output node\n")
 			n.dEdOut = float64(0.0)
 			for _, l := range n.outputNodes {
 				dEdInL, dInLdOut, ws := l.backward()
@@ -164,8 +174,14 @@ func (n *node) backward() (dEdOut float64, derAct float64, weights []float64) {
 			}
 			n.dOutdIn = n.derivativeActivation(n.myout)
 			n.dIndW = n.inputs
-			for index, dIndW := range n.dIndW {
-				n.dEdW[index] = n.dEdOut * n.dOutdIn * dIndW
+			if len(n.dEdW) == 0 {
+				for _, dIndW := range n.dIndW {
+					n.dEdW = append(n.dEdW, n.dEdOut*n.dOutdIn*dIndW)
+				}
+			} else {
+				for index, dIndW := range n.dIndW {
+					n.dEdW[index] = n.dEdOut * n.dOutdIn * dIndW
+				}
 			}
 		}
 
