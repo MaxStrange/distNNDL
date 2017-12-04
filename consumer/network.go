@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -11,6 +12,7 @@ type network struct {
 	batchLength int
 	epochLength int
 	mixLength   int
+	nodes       []*node
 	weights     []float64
 }
 
@@ -19,12 +21,13 @@ func makeNetwork(batchLength int, epochLength int, mixLength int) *network {
 		batchLength: batchLength,
 		epochLength: epochLength,
 		mixLength:   mixLength,
+		nodes:       []*node{},
 		weights:     []float64{},
 	}
 }
 
 func (net *network) parseNetFromNNDL(nndl string) {
-	// TODO
+	parseNNDLIntoNetwork(nndl, net)
 }
 
 // To be called AFTER a synchronous call to parseNetFromNNDL
@@ -83,13 +86,12 @@ func parseData(rawData string) (input []float64, label []float64) {
 }
 
 func (net *network) weightsToString() string {
-	// var buffer bytes.Buffer
-	// for _, n := range net.AllNeurons() {
-	// 	buffer.WriteString(fmt.Sprintf("%s: ", n.id())
-	// 	for _, w := range n.weights {
-	// 		buffer.WriteString(fmt.Sprintf("%f ", w))
-	// 	}
-	// }
-	// return buffer.String()
-	return "TODO: weights"
+	var buffer bytes.Buffer
+	for _, n := range net.nodes {
+		buffer.WriteString(fmt.Sprintf("%s: ", n.id()))
+		for _, w := range n.weights {
+			buffer.WriteString(fmt.Sprintf("%f ", w))
+		}
+	}
+	return buffer.String()
 }
