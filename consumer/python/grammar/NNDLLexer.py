@@ -1,11 +1,13 @@
-# Generated from NNDL.g4 by ANTLR 4.6
+# Generated from NNDL.g4 by ANTLR 4.7
 from antlr4 import *
 from io import StringIO
+from typing.io import TextIO
+import sys
 
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\2(")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2(")
         buf.write("\u0107\b\1\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7")
         buf.write("\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r")
         buf.write("\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23")
@@ -31,22 +33,22 @@ def serializedATN():
         buf.write("\6\13\7\r\b\17\t\21\n\23\13\25\f\27\r\31\16\33\17\35\20")
         buf.write("\37\21!\22#\23%\24\'\25)\26+\27-\30/\31\61\32\63\33\65")
         buf.write("\34\67\359\36;\37= ?!A\"C#E$G%I&K\'M\2O\2Q(\3\2\4\4\2")
-        buf.write("C\\c|\5\2\13\f\16\17\"\"\u010a\2\3\3\2\2\2\2\5\3\2\2\2")
-        buf.write("\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2\17")
-        buf.write("\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3")
-        buf.write("\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2")
-        buf.write("\2\2\2!\3\2\2\2\2#\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2)\3")
-        buf.write("\2\2\2\2+\3\2\2\2\2-\3\2\2\2\2/\3\2\2\2\2\61\3\2\2\2\2")
-        buf.write("\63\3\2\2\2\2\65\3\2\2\2\2\67\3\2\2\2\29\3\2\2\2\2;\3")
-        buf.write("\2\2\2\2=\3\2\2\2\2?\3\2\2\2\2A\3\2\2\2\2C\3\2\2\2\2E")
-        buf.write("\3\2\2\2\2G\3\2\2\2\2I\3\2\2\2\2K\3\2\2\2\2Q\3\2\2\2\3")
-        buf.write("S\3\2\2\2\5U\3\2\2\2\7W\3\2\2\2\tY\3\2\2\2\13[\3\2\2\2")
-        buf.write("\r]\3\2\2\2\17_\3\2\2\2\21a\3\2\2\2\23c\3\2\2\2\25e\3")
-        buf.write("\2\2\2\27g\3\2\2\2\31i\3\2\2\2\33l\3\2\2\2\35n\3\2\2\2")
-        buf.write("\37q\3\2\2\2!t\3\2\2\2#w\3\2\2\2%z\3\2\2\2\'|\3\2\2\2")
-        buf.write(")~\3\2\2\2+\u0080\3\2\2\2-\u0082\3\2\2\2/\u0084\3\2\2")
-        buf.write("\2\61\u0086\3\2\2\2\63\u008d\3\2\2\2\65\u0095\3\2\2\2")
-        buf.write("\67\u00a1\3\2\2\29\u00a9\3\2\2\2;\u00b5\3\2\2\2=\u00c1")
+        buf.write("C\\c|\5\2\13\f\16\17\"\"\2\u010a\2\3\3\2\2\2\2\5\3\2\2")
+        buf.write("\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2")
+        buf.write("\17\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27")
+        buf.write("\3\2\2\2\2\31\3\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3")
+        buf.write("\2\2\2\2!\3\2\2\2\2#\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2")
+        buf.write(")\3\2\2\2\2+\3\2\2\2\2-\3\2\2\2\2/\3\2\2\2\2\61\3\2\2")
+        buf.write("\2\2\63\3\2\2\2\2\65\3\2\2\2\2\67\3\2\2\2\29\3\2\2\2\2")
+        buf.write(";\3\2\2\2\2=\3\2\2\2\2?\3\2\2\2\2A\3\2\2\2\2C\3\2\2\2")
+        buf.write("\2E\3\2\2\2\2G\3\2\2\2\2I\3\2\2\2\2K\3\2\2\2\2Q\3\2\2")
+        buf.write("\2\3S\3\2\2\2\5U\3\2\2\2\7W\3\2\2\2\tY\3\2\2\2\13[\3\2")
+        buf.write("\2\2\r]\3\2\2\2\17_\3\2\2\2\21a\3\2\2\2\23c\3\2\2\2\25")
+        buf.write("e\3\2\2\2\27g\3\2\2\2\31i\3\2\2\2\33l\3\2\2\2\35n\3\2")
+        buf.write("\2\2\37q\3\2\2\2!t\3\2\2\2#w\3\2\2\2%z\3\2\2\2\'|\3\2")
+        buf.write("\2\2)~\3\2\2\2+\u0080\3\2\2\2-\u0082\3\2\2\2/\u0084\3")
+        buf.write("\2\2\2\61\u0086\3\2\2\2\63\u008d\3\2\2\2\65\u0095\3\2")
+        buf.write("\2\2\67\u00a1\3\2\2\29\u00a9\3\2\2\2;\u00b5\3\2\2\2=\u00c1")
         buf.write("\3\2\2\2?\u00d1\3\2\2\2A\u00d7\3\2\2\2C\u00db\3\2\2\2")
         buf.write("E\u00ea\3\2\2\2G\u00ec\3\2\2\2I\u00ee\3\2\2\2K\u00f8\3")
         buf.write("\2\2\2M\u00fc\3\2\2\2O\u00fe\3\2\2\2Q\u0101\3\2\2\2ST")
@@ -116,7 +118,6 @@ class NNDLLexer(Lexer):
 
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
 
-
     T__0 = 1
     T__1 = 2
     T__2 = 3
@@ -156,6 +157,8 @@ class NNDLLexer(Lexer):
     NUM = 37
     WS = 38
 
+    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
+
     modeNames = [ "DEFAULT_MODE" ]
 
     literalNames = [ "<INVALID>",
@@ -180,9 +183,9 @@ class NNDLLexer(Lexer):
 
     grammarFileName = "NNDL.g4"
 
-    def __init__(self, input=None):
-        super().__init__(input)
-        self.checkVersion("4.6")
+    def __init__(self, input=None, output:TextIO = sys.stdout):
+        super().__init__(input, output)
+        self.checkVersion("4.7")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None

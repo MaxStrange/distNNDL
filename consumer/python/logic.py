@@ -37,7 +37,6 @@ def py(logical_expr, log_type, var):
     else:
         return _pymath(logical_expr, var)
 
-
 def _pylogical(logical_expr, var):
     ands = logical_expr.strip("{").strip("}").split("&&")
     ands = ["(" + a + ")" for a in ands]
@@ -61,7 +60,6 @@ def _pyclass(logical_expr, var):
                 var + "<=" + upperbound + "}"
     return expr
 
-
 def _pymath(logical_expr, var):
     expr = "{" + var + "==" + "int(" + logical_expr + ")}"
     return expr
@@ -72,15 +70,12 @@ def pygen(rules, network):
     """
     t = _pyboilerplate(network)
     t += _pyconnect(rules, network)
-    with open("apply_rules.py", 'w') as f:
+    home = os.path.split(os.path.realpath(__file__))[0]
+    with open(os.sep.join([home, "apply_rules.py"]), 'w') as f:
         f.write(t)
     mod = __import__("apply_rules")
-    print("Python module written to apply_rules.py.")
-    print("Applying the logic from the python module. For large networks, this may take a while...")
     mod.apply_rules(network)
-    print("Done.")
     return network
-
 
 def _pyboilerplate(network):
     t = \
@@ -114,4 +109,3 @@ def _pyconnect(rules, network):
             t += os.linesep
 
     return t
-

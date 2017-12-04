@@ -1,52 +1,28 @@
 """
-This module provides a class for the antlr framework to walk the tree
-and generate dot graphs.
 """
-
-import compiler.dotwriter as dotwriter
-import compiler.logic as logic
-import compiler.network as network
+import logic
+import network
 from grammar import NNDLListener
-import subprocess
 
 
 class DotGenerator(NNDLListener.NNDLListener):
     """
     Listener that generates dot files when walked over the nndl tree.
     """
-    def __init__(self, fname, output_fname):
-        self._fname = fname
-        self._output_fname = output_fname
+    def __init__(self):
         self._network = network.Network()
-        self._aborted_dot_file = False
 
     def enterProg(self, ctx):
-        dotwriter.write_boilerplate(self._output_fname)
+        pass
 
     def exitProg(self, ctx):
-        if self._aborted_dot_file:
-            subprocess.call(["rm", self._output_fname])
-            print("Couldn't write the dot file - it was too big.")
-        else:
-            dotwriter.write_end(self._output_fname);
-            subprocess.call(["dot", "-Tpng", self._output_fname, "-o",\
-                    self._output_fname[:-4] + ".png"])
-            print("Wrote dot file for %s to %s." %\
-                    (self._fname, self._output_fname))
-            print("Also compiled it into a .png file %s." %\
-                    (self._output_fname[:-4] + ".png"))
+        pass
 
     def exitLayer_stat(self, ctx):
         layer_name = ctx.ID()[0].getText()
         num_rows = int(ctx.NUM()[0].getText())
         num_cols = int(ctx.NUM()[1].getText())
         neuron_type = ctx.ID()[1].getText()
-        color = dotwriter.get_color(len(self._network.layers))
-
-        if not self._aborted_dot_file:
-            dotwriter.write_layer(name=layer_name, nrows=num_rows,
-                    ncols=num_cols, neur_type=neuron_type, color=color,
-                    fname=self._output_fname)
 
         self._network.add_layer(nrows=num_rows, ncols=num_cols,
                 neurtype=neuron_type, name=layer_name)
@@ -88,9 +64,6 @@ class DotGenerator(NNDLListener.NNDLListener):
             rules.append((from_rule, to_rules))
 
         self._network = logic.pygen(rules, self._network)
-        self._aborted_dot_file = not dotwriter.write_connections(self._network.connections,
-                self._output_fname)
-
 
     def _lookup_log_type(self, logical_expr):
         """
@@ -103,11 +76,3 @@ class DotGenerator(NNDLListener.NNDLListener):
             return "class"
         else:
             return "math"
-
-
-
-
-
-
-
-

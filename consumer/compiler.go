@@ -1,61 +1,24 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
-
-	"github.com/MaxStrange/distNNDL/consumer/parser/parser"
+	"strconv"
+	"strings"
 )
 
-type treeShapeListener struct {
-	*parser.BaseNNDLListener
-	net *network
+type simpleNet struct {
+	connections [][]string
+	layers      [][]string
+	layerNames  []string
 }
-
-func newTreeShapeListener(net *network) *treeShapeListener {
-	return &treeShapeListener{
-		net: net,
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////
-/*
-func (tsl *treeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
-	fmt.Println(ctx.GetText())
-}
-
-func (tsl *treeShapeListener) ExitLayer_stat(ctx *parser.Layer_statContext) {
-	layerName := ctx.ID(0).GetText()
-	numRows, _ := strconv.ParseInt(ctx.NUM(0).GetText(), 10, 64)
-	numCols, _ := strconv.ParseInt(ctx.NUM(1).GetText(), 10, 64)
-	neuronType := ctx.ID(1).GetText()
-	tsl.net.addLayer(numRows, numCols, neuronType, layerName)
-}
-
-func (tsl *treeShapeListener) EnterConnection_stat(ctx *parser.Connection_statContext) {
-	//self._conx = []
-}
-
-func (tsl *treeShapeListener) ExitConnection_stat(ctx *parser.Connection_statContext) {
-}
-*/
-////////////////////////////////////////////////////////////////////////////
 
 func parseNNDLIntoNetwork(nndlContent string, net *network) {
-	// input := antlr.NewInputStream(nndlContent)
-	// lexer := parser.NewNNDLLexer(input)
-	// stream := antlr.NewCommonTokenStream(lexer, 0)
-	// p := parser.NewNNDLParser(stream)
-	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-	// p.BuildParseTrees = true
-	// tree := p.Prog()
-	// antlr.ParseTreeWalkerDefault.Walk(newTreeShapeListener(net), tree)
-
-	// TODO: print nndlContent to a file, then hand it over to Python to parse.
 	fmt.Println("Parsing the network...")
 	ex, err := os.Executable()
 	if err != nil {
@@ -89,7 +52,61 @@ func parseNNDLIntoNetwork(nndlContent string, net *network) {
 		panic(err)
 	}
 	pycmd.Wait()
-	fmt.Println("!!!!!!!!!!!!!!Reading from Python Command!!!!!!!!!!!!!!!!!!!!!")
-	fmt.Println(string(pyBytes))
-	fmt.Println(string(pyErrBytes))
+	if string(pyErrBytes) != "" {
+		fmt.Println(string(pyErrBytes))
+		fmt.Fprintf(os.Stderr, "Error received from python subprocess.")
+		os.Exit(-1)
+	}
+
+	var netFromPy map[string][][]string
+	err = json.Unmarshal(pyBytes, &netFromPy)
+	if err != nil {
+		fmt.Println("Error:", err)
+		panic(err)
+	}
+
+	simple := simpleNet{
+		connections: netFromPy["connections"],
+		layers:      netFromPy["layers"],
+		layerNames:  netFromPy["layer_names"][0],
+	}
+	fmt.Fprintf(os.Stdout, "Connections: %v\nLayers: %v\nLayerNames: %v\n", simple.connections, simple.layers, simple.layerNames)
+
+	const learningRate = 0.3
+	for layerIndex, layer := range simple.layers {
+		var nt nodeType
+		if layerIndex == 0 {
+			nt = inputNode
+		} else if layerIndex == len(simple.layers)-1 {
+			nt = outputNode
+		} else {
+			nt = hiddenNode
+		}
+		for nodeIndex := range layer {
+			newOne := newNode(
+				smallRandomNumbers,
+				logistic,
+				derLogistic,
+				nodeIndex,
+				learningRate,
+				layerIndex,
+				derError,
+				nt,
+			)
+			net.nodes = append(net.nodes, newOne)
+		}
+	}
+
+	for _, fromTo := range simple.connections {
+		from := fromTo[0]
+		to := fromTo[1]
+		fromSplit := strings.Split(from, "_")
+		toSplit := strings.Split(to, "_")
+		fromLayerName := strings.Join(fromSplit[0:len(fromSplit)-1], "_")
+		toLayerName := strings.Join(toSplit[0:len(toSplit)-1], "_")
+		fromNodeIndex, _ := strconv.ParseInt(fromSplit[len(fromSplit)-1], 10, 64)
+		toNodeIndex, _ := strconv.ParseInt(toSplit[len(toSplit)-1], 10, 64)
+
+		fmt.Fprintf(os.Stdout, "%s %d -> %s %d\n", fromLayerName, fromNodeIndex, toLayerName, toNodeIndex)
+	}
 }

@@ -1,7 +1,7 @@
 """
 ADT for holding random network stuff.
 """
-
+import json
 import os
 
 class Network:
@@ -18,6 +18,11 @@ class Network:
         as_str += "Layer_names: " + str(self.layer_names) + ";}"
         return as_str
 
+    def to_json(self):
+        attrs = ["connections", "layers", "layer_names"]
+        self_to_json = {str(name): [getattr(self, name)] if name == "layer_names" else getattr(self, name) for name in attrs}
+        return json.dumps(self_to_json)
+
     def add_layer(self, nrows, ncols, neurtype, name):
         """
         Adds a layer to the network with nrows and ncols.
@@ -32,7 +37,6 @@ class Network:
         """
         nfrom = self.layer_names[i] + "_" + str(j)
         nto = self.layer_names[k] + "_" + str(l)
-        connection = (nfrom, nto)
+        connection = [nfrom, nto]
         if connection not in self.connections:
             self.connections.append(connection)
-

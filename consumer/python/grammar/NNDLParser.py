@@ -1,11 +1,13 @@
-# Generated from NNDL.g4 by ANTLR 4.6
+# Generated from NNDL.g4 by ANTLR 4.7
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
+from typing.io import TextIO
+import sys
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3(")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3(")
         buf.write("\u0089\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f\t\f\4\r\t\r\4\16")
         buf.write("\t\16\3\2\7\2\36\n\2\f\2\16\2!\13\2\3\2\3\2\3\2\3\3\3")
@@ -19,15 +21,15 @@ def serializedATN():
         buf.write("\3\16\3\16\3\16\3\16\3\16\3\16\7\16\u0084\n\16\f\16\16")
         buf.write("\16\u0087\13\16\3\16\2\4\30\32\17\2\4\6\b\n\f\16\20\22")
         buf.write("\24\26\30\32\2\6\3\2\r\21\3\2\22\23\3\2\24\26\3\2\27\30")
-        buf.write("\u0085\2\37\3\2\2\2\4%\3\2\2\2\6)\3\2\2\2\b.\3\2\2\2\n")
-        buf.write("\66\3\2\2\2\f?\3\2\2\2\16I\3\2\2\2\20X\3\2\2\2\22a\3\2")
-        buf.write("\2\2\24c\3\2\2\2\26g\3\2\2\2\30k\3\2\2\2\32{\3\2\2\2\34")
-        buf.write("\36\5\4\3\2\35\34\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37")
-        buf.write(" \3\2\2\2 \"\3\2\2\2!\37\3\2\2\2\"#\5\6\4\2#$\7\2\2\3")
-        buf.write("$\3\3\2\2\2%&\7\32\2\2&\'\7&\2\2\'(\7\31\2\2(\5\3\2\2")
-        buf.write("\2)*\7\33\2\2*+\5\b\5\2+,\5\n\6\2,-\7\34\2\2-\7\3\2\2")
-        buf.write("\2.\60\7\35\2\2/\61\5\f\7\2\60/\3\2\2\2\61\62\3\2\2\2")
-        buf.write("\62\60\3\2\2\2\62\63\3\2\2\2\63\64\3\2\2\2\64\65\7\36")
+        buf.write("\2\u0085\2\37\3\2\2\2\4%\3\2\2\2\6)\3\2\2\2\b.\3\2\2\2")
+        buf.write("\n\66\3\2\2\2\f?\3\2\2\2\16I\3\2\2\2\20X\3\2\2\2\22a\3")
+        buf.write("\2\2\2\24c\3\2\2\2\26g\3\2\2\2\30k\3\2\2\2\32{\3\2\2\2")
+        buf.write("\34\36\5\4\3\2\35\34\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2")
+        buf.write("\37 \3\2\2\2 \"\3\2\2\2!\37\3\2\2\2\"#\5\6\4\2#$\7\2\2")
+        buf.write("\3$\3\3\2\2\2%&\7\32\2\2&\'\7&\2\2\'(\7\31\2\2(\5\3\2")
+        buf.write("\2\2)*\7\33\2\2*+\5\b\5\2+,\5\n\6\2,-\7\34\2\2-\7\3\2")
+        buf.write("\2\2.\60\7\35\2\2/\61\5\f\7\2\60/\3\2\2\2\61\62\3\2\2")
+        buf.write("\2\62\60\3\2\2\2\62\63\3\2\2\2\63\64\3\2\2\2\64\65\7\36")
         buf.write("\2\2\65\t\3\2\2\2\66:\7\37\2\2\679\5\16\b\28\67\3\2\2")
         buf.write("\29<\3\2\2\2:8\3\2\2\2:;\3\2\2\2;=\3\2\2\2<:\3\2\2\2=")
         buf.write(">\7 \2\2>\13\3\2\2\2?@\7!\2\2@A\7\3\2\2AB\7&\2\2BC\7\'")
@@ -139,9 +141,9 @@ class NNDLParser ( Parser ):
     NUM=37
     WS=38
 
-    def __init__(self, input:TokenStream):
-        super().__init__(input)
-        self.checkVersion("4.6")
+    def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
+        super().__init__(input, output)
+        self.checkVersion("4.7")
         self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
         self._predicates = None
 
