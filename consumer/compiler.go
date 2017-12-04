@@ -19,14 +19,12 @@ type simpleNet struct {
 }
 
 func parseNNDLIntoNetwork(nndlContent string, net *network) {
-	fmt.Println("Parsing the network...")
 	ex, err := os.Executable()
 	if err != nil {
 		panic(err)
 	}
 	exPath := filepath.Dir(ex)
 	pypath := path.Join(exPath, "python", "compiler.py")
-	fmt.Println("Pypath: " + pypath)
 	pycmd := exec.Command("python3", pypath)
 	pyIn, err := pycmd.StdinPipe()
 	if err != nil {
@@ -70,7 +68,6 @@ func parseNNDLIntoNetwork(nndlContent string, net *network) {
 		layers:      netFromPy["layers"],
 		layerNames:  netFromPy["layer_names"][0],
 	}
-	fmt.Fprintf(os.Stdout, "Connections: %v\nLayers: %v\nLayerNames: %v\n", simple.connections, simple.layers, simple.layerNames)
 
 	const learningRate = 0.3
 	for layerIndex, layer := range simple.layers {
@@ -82,6 +79,7 @@ func parseNNDLIntoNetwork(nndlContent string, net *network) {
 		} else {
 			nt = hiddenNode
 		}
+		constructingLayer := []*node{}
 		for nodeIndex := range layer {
 			newOne := newNode(
 				smallRandomNumbers,
@@ -93,8 +91,9 @@ func parseNNDLIntoNetwork(nndlContent string, net *network) {
 				derError,
 				nt,
 			)
-			net.nodes = append(net.nodes, newOne)
+			constructingLayer = append(constructingLayer, newOne)
 		}
+		net.nodes = append(net.nodes, constructingLayer)
 	}
 
 	for _, fromTo := range simple.connections {
@@ -107,6 +106,21 @@ func parseNNDLIntoNetwork(nndlContent string, net *network) {
 		fromNodeIndex, _ := strconv.ParseInt(fromSplit[len(fromSplit)-1], 10, 64)
 		toNodeIndex, _ := strconv.ParseInt(toSplit[len(toSplit)-1], 10, 64)
 
-		fmt.Fprintf(os.Stdout, "%s %d -> %s %d\n", fromLayerName, fromNodeIndex, toLayerName, toNodeIndex)
+		fromLayerIndex := getIndexFromLayerName(fromLayerName, simple.layerNames)
+		toLayerIndex := getIndexFromLayerName(toLayerName, simple.layerNames)
+		toNode := net.nodes[toLayerIndex][toNodeIndex]
+		fromNode := net.nodes[fromLayerIndex][fromNodeIndex]
+
+		toNode.inputNodes = append(toNode.inputNodes, fromNode)
+		fromNode.outputNodes = append(fromNode.outputNodes, toNode)
 	}
+}
+
+func getIndexFromLayerName(layerName string, layers []string) int {
+	for index, name := range layers {
+		if layerName == name {
+			return index
+		}
+	}
+	return -1
 }

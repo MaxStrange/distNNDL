@@ -1,6 +1,7 @@
 package main
 
 import "fmt"
+import "os"
 
 type nodeType int
 
@@ -84,7 +85,7 @@ func newNode(wi weightInitializer, af activationFunction, da derivativeActivatio
 }
 
 func (n *node) String() string {
-	return fmt.Sprintf("NODE %d.%d", n.myIndex, n.layerIndex)
+	return fmt.Sprintf("NODE %d.%d", n.layerIndex, n.myIndex)
 }
 
 // initialize creates this node's input weights.
@@ -120,6 +121,7 @@ func (n *node) forward() float64 {
 		return n.myout
 	}
 
+	fmt.Fprintf(os.Stdout, "  Forward node %s\n", n.String())
 	if n.myType == inputNode {
 		n.myout = n.inputValue
 	} else {
@@ -135,6 +137,7 @@ func (n *node) forward() float64 {
 	}
 
 	n.myoutCached = true
+	fmt.Fprintf(os.Stdout, "      Returning %f", n.myout)
 	return n.myout
 }
 
