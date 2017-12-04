@@ -89,7 +89,8 @@ func (n *Node) String() string {
 
 func (n *Node) Initialize() {
 	for _, node := range n.inputNodes {
-		n.weights = append(n.weights, n.weightInitializer(n.layerIndex, node.myIndex, n.myIndex))
+		weight := n.weightInitializer(n.layerIndex, node.myIndex, n.myIndex)
+		n.weights = append(n.weights, weight)
 	}
 }
 

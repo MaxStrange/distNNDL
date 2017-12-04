@@ -111,6 +111,8 @@ func main() {
 	fmt.Println(fmt.Sprintf("Labels: %v", labelVectorsAndSet))
 	fmt.Println(net.String())
 
-	// TODO: need to initialize the network's weights first
-	net.Run(inputVectorsAndSet, labelVectorsAndSet, 10)
+	net.Initialize()
+	net.PrintWeights()
+
+	//net.Run(inputVectorsAndSet, labelVectorsAndSet, 10)
 }

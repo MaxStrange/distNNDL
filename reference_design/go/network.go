@@ -7,9 +7,9 @@ import (
 )
 
 type network struct {
-	inputLayer   layer
-	hiddenLayers []layer
-	outputLayer  layer
+	inputLayer   *layer
+	hiddenLayers []*layer
+	outputLayer  *layer
 	errFunc      func(labels []FloatXX, outputs []FloatXX) (errors []FloatXX)
 }
 
@@ -27,6 +27,7 @@ func (net *network) Initialize() {
 	for _, node := range net.AllNeurons() {
 		node.Initialize()
 	}
+	net.PrintWeights()
 }
 
 // Run runs the training for the given number of epochs.
@@ -102,12 +103,28 @@ func (net *network) Evaluate(inputVectors [][]FloatXX, labels [][]FloatXX) Float
 	return totalAcc
 }
 
-func (net *network) AllNeurons() []Node {
-	var allNodes []Node
+func (net *network) AllNeurons() []*Node {
+	var allNodes []Node // TODO: This needs to be a list of pointers
 	allNodes = append(allNodes, net.inputLayer.nodes...)
 	for _, hLayer := range net.hiddenLayers {
 		allNodes = append(allNodes, hLayer.nodes...)
 	}
 	allNodes = append(allNodes, net.outputLayer.nodes...)
-	return allNodes
+
+	var allPointers []*Node
+	for index := range allNodes {
+		allPointers = append(allPointers, &allNodes[index])
+	}
+	return allPointers
+}
+
+func (net *network) PrintWeights() {
+	for _, n := range net.AllNeurons() {
+		var buffer bytes.Buffer
+		buffer.WriteString(fmt.Sprintf("%s: ", n.Id()))
+		for _, w := range n.weights {
+			buffer.WriteString(fmt.Sprintf("%f ", w))
+		}
+		fmt.Println(buffer.String())
+	}
 }
