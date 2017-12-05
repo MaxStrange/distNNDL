@@ -26,8 +26,10 @@ func main() {
 
 	go startnndlConsumer(group, broker, sigChan, nndlChan)
 	go startLabeledDataTopic(broker, sigChan, dataChan)
+	kafkaProducer := makeProducer(broker)
+	go kafkaProducer.startProducer(sigChan)
 
-	batchLength, epochLength, mixLength := getMetaInformation(broker, group, sigChan)
+	batchLength, epochLength, mixLength, jobID := getMetaInformation(broker, group, sigChan)
 	net := makeNetwork(batchLength, epochLength, mixLength)
 	run := true
 	for run == true {
@@ -40,7 +42,8 @@ func main() {
 			net.parseNetFromNNDL(msg)
 			go net.train(dataChan, trainingChan)
 		case msg := <-trainingChan:
-			fmt.Println(msg)
+			fmt.Println("Sending:\n" + msg)
+			kafkaProducer.send(jobID, msg, "statusInfo")
 		}
 	}
 }

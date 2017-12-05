@@ -76,6 +76,7 @@ func (net *network) train(dataChan <-chan string, mainChan chan<- string) {
 		}
 	}
 	mainChan <- net.weightsToString()
+	mainChan <- "DONE"
 }
 
 func averageError(totalErr [][]float64) []float64 {

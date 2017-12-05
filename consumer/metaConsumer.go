@@ -8,7 +8,7 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-func getMetaInformation(broker string, groupID string, sigChan <-chan os.Signal) (batchLength int, epochLength int, mixLength int) {
+func getMetaInformation(broker string, groupID string, sigChan <-chan os.Signal) (batchLength int, epochLength int, mixLength int, jobID string) {
 	metaConsumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":               broker,
 		"group.id":                        groupID,
@@ -48,7 +48,11 @@ func getMetaInformation(broker string, groupID string, sigChan <-chan os.Signal)
 				case "mixLength":
 					fmt.Fprintf(os.Stdout, "MixLength: %s\n", string(e.Value))
 					mixLengthStr = string(e.Value)
+				case "jobID":
+					fmt.Fprintf(os.Stdout, "JobID: %s\n", string(e.Value))
+					jobID = string(e.Value)
 				case "terminate":
+					fmt.Fprintf(os.Stdout, "Received TERM for metadata\n")
 					run = false
 				default:
 					fmt.Fprintf(os.Stderr, "Got unexpected metainformation: key: %s", string(e.Key))
@@ -78,5 +82,5 @@ func getMetaInformation(broker string, groupID string, sigChan <-chan os.Signal)
 		ints = append(ints, int(i))
 	}
 	fmt.Fprintf(os.Stdout, "Integers: %d %d %d\n", ints[0], ints[1], ints[2])
-	return ints[0], ints[1], ints[2]
+	return ints[0], ints[1], ints[2], jobID
 }
